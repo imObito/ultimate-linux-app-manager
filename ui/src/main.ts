@@ -1,6 +1,6 @@
 import { MOCK_APPS, AppPackage } from './state/mockData';
 import { ICONS } from './design/icons';
-import { getAppIconUrl } from './design/appIcons';
+import { getAppIconSvg } from './design/appIcons';
 
 class UltimateAppManager {
   private apps: AppPackage[] = [];
@@ -424,14 +424,13 @@ class UltimateAppManager {
       card.style.animationDelay = `${staggerDelay}ms`;
       
       const tagClass = `tag-${(app.source || 'native').toLowerCase()}`;
-      const iconUrl = getAppIconUrl(app.id, app.name);
-      const initials = (app.name || 'AP').substring(0, 2).toUpperCase();
+      const iconMarkup = getAppIconSvg(app.id, app.name, app.category);
 
       card.innerHTML = `
         <div class="flex items-start justify-between gap-2 min-w-0">
           <div class="flex items-center gap-2.5 min-w-0 flex-1">
             <div class="w-9 h-9 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center p-1.5 shadow-inner shrink-0 backdrop-blur-sm overflow-hidden">
-              <img src="${iconUrl}" alt="${app.name}" class="w-full h-full object-contain" onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\\'font-bold text-amber-400 text-xs\\'>${initials}</span>';" />
+              ${iconMarkup}
             </div>
             <div class="overflow-hidden min-w-0 flex-1">
               <h4 class="text-xs font-bold text-white tracking-tight truncate" title="${app.name}">${app.name}</h4>
@@ -490,8 +489,7 @@ class UltimateAppManager {
       btnLabel.innerText = app.isSystemProtected ? 'System Protected (Cannot Remove)' : `Uninstall ${app.name}`;
     }
 
-    const iconUrl = getAppIconUrl(app.id, app.name);
-    const initials = (app.name || 'AP').substring(0, 2).toUpperCase();
+    const iconMarkup = getAppIconSvg(app.id, app.name, app.category);
 
     const sizeMb = Math.round(app.sizeBytes / (1024 * 1024));
     const sizePercent = Math.min(Math.round((sizeMb / 1200) * 100), 100);
@@ -504,8 +502,8 @@ class UltimateAppManager {
       <!-- App Header Profile Glass Card -->
       <div class="inspector-glass-card p-5 rounded-2xl space-y-4">
         <div class="flex items-center gap-4">
-          <div class="w-14 h-14 rounded-2xl bg-white/[0.05] border border-white/[0.12] flex items-center justify-center p-2.5 shadow-md shrink-0">
-            <img src="${iconUrl}" alt="${app.name}" class="w-full h-full object-contain" onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\\'font-extrabold text-amber-400 text-lg\\'>${initials}</span>';" />
+          <div class="w-14 h-14 rounded-2xl bg-white/[0.05] border border-white/[0.12] flex items-center justify-center p-2.5 shadow-md shrink-0 overflow-hidden">
+            ${iconMarkup}
           </div>
           <div class="overflow-hidden">
             <h3 class="text-lg font-bold text-white tracking-tight truncate">${app.name}</h3>
