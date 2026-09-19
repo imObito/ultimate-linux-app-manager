@@ -9,24 +9,36 @@
 
 ---
 
+## 📥 Download Standalone .AppImage (v1.0.0)
+
+[![Download .AppImage](https://img.shields.io/badge/Download-Ultimate--Linux--App--Manager--1.0.0.AppImage-ff5722?style=for-the-badge&logo=linux)](https://github.com/imObito/ultimate-linux-app-manager/releases/download/v1.0.0/Ultimate-Linux-App-Manager-1.0.0.AppImage)
+
+```bash
+# Make executable and launch immediately:
+chmod +x Ultimate-Linux-App-Manager-1.0.0.AppImage
+./Ultimate-Linux-App-Manager-1.0.0.AppImage
+```
+
+---
+
 ## 🌟 Overview
 
-**Ultimate Linux App Manager** is an elite desktop software management suite designed to replace archaic Linux package managers with a cutting-edge, hardware-accelerated, and visually stunning user experience. Built with a bespoke **Apple/Vercel/Linear-grade glassmorphism design system**, it unifies discovery, forensic inspection, dependency telemetry, and residual filesystem cleanup across all Linux packaging formats.
+**Ultimate Linux App Manager** is an elite desktop software management suite designed to replace archaic Linux package managers with a cutting-edge, hardware-accelerated, and visually stunning user experience. Built with a bespoke **Apple/Vercel/Linear-grade glassmorphism design system**, it unifies discovery, forensic inspection, dependency telemetry, residual filesystem cleanup, and multi-theme customization across all Linux packaging formats.
 
 ---
 
 ## ✨ Key Features
 
-### 💎 Elite 3-Column Glassmorphic Architecture
-- **Left Navigation Deck**: Quick categorical filtering (All Apps, Native Pacman, Flatpaks, AppImages, WebApps/PWAs, System Daemons, and Orphaned Packages) with live real-time badge counts and storage telemetry.
-- **Center Application Matrix**: High-density responsive card grid featuring:
-  - **Dynamic System Icons**: Automatic local system icon resolution and vector SVG branding.
-  - **Type Badges**: Neon capsule pills distinguishing Native, Flatpak, WebApp, and AppImage binaries.
-  - **Z-Depth Micro-Interactions**: Smooth 60fps elastic card elevations (`translateY(-4px)` with beveled specular highlights).
-- **Right Forensic Telemetry Sheet**: Slide-out live forensic inspector displaying:
-  - **SVG Circular Gauges & Progress Bars**: Visual memory footprint, disk usage, and storage impact metrics.
-  - **Deep Path Inspection**: Instant audit of binaries (`/usr/bin`), data folders (`~/.local/share`), configuration directories (`~/.config`), cache sinks (`~/.cache`), and systemd unit services.
-  - **Dependency Hierarchy**: Reverse dependency trees and orphan risk levels.
+### 💎 Elite Tabbed Navigation & Glassmorphic Dashboard
+- **Top Tab Bar**: Instant switching between `[ 📦 Applications ]`, `[ 🧹 System Cleaner ]`, `[ ⚙️ Settings & Themes ]`, and `[ ℹ️ About ]`.
+- **Top Quick Tip Banner**: Helpful dismissible guides and quick-start hints.
+- **Multi-Theme Engine**: 4 interactive themes with persistent local storage:
+  1. *Obsidian Onyx* (Apple/Vercel deep space)
+  2. *Cyber Emerald* (Matrix Neon green)
+  3. *Neon Cyberpunk* (Violet glow)
+  4. *Titanium Ice* (Deep blue / cyan)
+- **Categorized App Deck**: Clean grouped sections for **Gaming & Emulators**, **Flatpak Applications**, **System Packages (Pacman)**, and **WebApps & PWAs** with badge counters, custom app registration, and folder scanners.
+- **Slide-out Forensic Telemetry Sheet**: Real SVG circular gauges, memory/disk footprint progress bars, deep residual directory audits, and dependency trees.
 
 ### 🔍 Spotlight Global Search (`⌘K` / `Ctrl+K`)
 - Instant fuzzy search across thousands of system packages.
