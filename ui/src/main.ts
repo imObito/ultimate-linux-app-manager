@@ -2,18 +2,145 @@ import { MOCK_APPS, AppPackage } from './state/mockData';
 import { ICONS } from './design/icons';
 import { getAppIconUrl } from './design/appIcons';
 
-class XenoUninstallerModernApp {
+class UltimateAppManager {
   private apps: AppPackage[] = [];
   private selectedApp: AppPackage | null = null;
   private currentFilter: string = 'ALL';
   private searchQuery: string = '';
-  private currentSort: string = 'name-asc';
+  private currentTab: string = 'applications';
+  private currentTheme: string = 'theme-obsidian';
 
   constructor() {
     this.apps = [...MOCK_APPS];
+    this.loadPersistedSettings();
+    this.initTopNavigation();
+    this.initQuickTip();
     this.initSidebarNavigation();
+    this.initThemeSelector();
+    this.initCleanupActions();
     this.initEventListeners();
     this.render();
+  }
+
+  private loadPersistedSettings() {
+    const savedTheme = localStorage.getItem('uam_theme') || 'theme-obsidian';
+    this.setTheme(savedTheme);
+
+    const tipDismissed = localStorage.getItem('uam_tip_dismissed');
+    if (tipDismissed === 'true') {
+      const banner = document.getElementById('quick-tip-banner');
+      if (banner) banner.style.display = 'none';
+    }
+  }
+
+  private setTheme(themeName: string) {
+    this.currentTheme = themeName;
+    document.body.className = `${themeName} text-gray-100 flex flex-col h-screen w-screen overflow-hidden antialiased relative`;
+    localStorage.setItem('uam_theme', themeName);
+
+    // Update theme card active styles in settings
+    document.querySelectorAll('.theme-card').forEach(card => {
+      const cardTheme = card.getAttribute('data-theme');
+      const badge = card.querySelector('span:last-child');
+      if (cardTheme === themeName) {
+        card.className = "theme-card p-4 rounded-xl border border-amber-500/50 bg-white/[0.05] cursor-pointer transition-all hover:scale-[1.02] flex flex-col gap-2.5";
+        if (badge) {
+          badge.textContent = "Active";
+          badge.className = "text-amber-400 font-bold";
+        }
+      } else {
+        card.className = "theme-card p-4 rounded-xl border border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.04] cursor-pointer transition-all hover:scale-[1.02] flex flex-col gap-2.5";
+        if (badge) {
+          badge.textContent = "Select";
+          badge.className = "text-slate-500 text-[10px]";
+        }
+      }
+    });
+  }
+
+  private initTopNavigation() {
+    const tabs = document.querySelectorAll('.top-nav-tab');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const targetTab = tab.getAttribute('data-tab');
+        if (!targetTab) return;
+
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        this.switchTab(targetTab);
+      });
+    });
+  }
+
+  private switchTab(tabId: string) {
+    this.currentTab = tabId;
+
+    const views = ['applications', 'cleanup', 'settings', 'about'];
+    views.forEach(v => {
+      const el = document.getElementById(`view-${v}`);
+      if (el) {
+        if (v === tabId) {
+          el.classList.remove('hidden');
+          if (v === 'applications') {
+            el.classList.add('flex');
+          } else {
+            el.classList.add('block');
+          }
+        } else {
+          el.classList.add('hidden');
+          el.classList.remove('flex', 'block');
+        }
+      }
+    });
+  }
+
+  private initQuickTip() {
+    const btnDismiss = document.getElementById('btn-dismiss-tip');
+    const banner = document.getElementById('quick-tip-banner');
+
+    btnDismiss?.addEventListener('click', () => {
+      if (banner) {
+        banner.style.opacity = '0';
+        banner.style.transition = 'opacity 0.2s ease';
+        setTimeout(() => {
+          banner.style.display = 'none';
+        }, 200);
+      }
+      localStorage.setItem('uam_tip_dismissed', 'true');
+    });
+  }
+
+  private initThemeSelector() {
+    document.querySelectorAll('.theme-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const theme = card.getAttribute('data-theme');
+        if (theme) {
+          this.setTheme(theme);
+        }
+      });
+    });
+  }
+
+  private initCleanupActions() {
+    document.getElementById('btn-run-full-clean')?.addEventListener('click', () => {
+      const btn = document.getElementById('btn-run-full-clean') as HTMLButtonElement;
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span>⚡ Optimizing Caches & Orphans...</span>';
+        
+        setTimeout(() => {
+          btn.innerHTML = '<span>✅ System Cleaned (2.27 GB Freed)</span>';
+          btn.className = "px-5 py-2.5 rounded-xl bg-emerald-500 text-black font-bold text-xs shadow-lg shadow-emerald-500/25 transition-all";
+          
+          setTimeout(() => {
+            btn.disabled = false;
+            btn.innerHTML = '⚡ 1-Click Optimize System';
+            btn.className = "px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs shadow-lg shadow-amber-500/25 transition-all";
+          }, 4000);
+        }, 1200);
+      }
+    });
   }
 
   private initSidebarNavigation() {
@@ -40,7 +167,7 @@ class XenoUninstallerModernApp {
 
     if (categoriesContainer) {
       categoriesContainer.innerHTML = categories.map(cat => `
-        <button data-filter="${cat.id}" class="nav-btn flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-white/[0.04] transition-all ${cat.id === 'ALL' ? 'bg-xeno-gold/15 text-xeno-gold font-semibold shadow-sm border border-xeno-gold/25' : ''}">
+        <button data-filter="${cat.id}" class="nav-btn flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-white/[0.04] transition-all ${cat.id === 'ALL' ? 'bg-amber-500/15 text-amber-400 font-semibold shadow-sm border border-amber-500/25' : ''}">
           <div class="flex items-center gap-3">
             <span class="opacity-80">${cat.icon}</span>
             <span>${cat.label}</span>
@@ -66,10 +193,10 @@ class XenoUninstallerModernApp {
     document.querySelectorAll('.nav-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.nav-btn').forEach(b => {
-          b.classList.remove('bg-xeno-gold/15', 'text-xeno-gold', 'font-semibold', 'shadow-sm', 'border', 'border-xeno-gold/25');
+          b.classList.remove('bg-amber-500/15', 'text-amber-400', 'font-semibold', 'shadow-sm', 'border', 'border-amber-500/25');
           b.classList.add('text-slate-400');
         });
-        btn.classList.add('bg-xeno-gold/15', 'text-xeno-gold', 'font-semibold', 'shadow-sm', 'border', 'border-xeno-gold/25');
+        btn.classList.add('bg-amber-500/15', 'text-amber-400', 'font-semibold', 'shadow-sm', 'border', 'border-amber-500/25');
         btn.classList.remove('text-slate-400');
 
         this.currentFilter = btn.getAttribute('data-filter') || 'ALL';
@@ -82,7 +209,6 @@ class XenoUninstallerModernApp {
     const searchInput = document.getElementById('global-search-input') as HTMLInputElement;
     const spotlightOverlay = document.getElementById('spotlight-dim-overlay');
 
-    // 3. Spotlight CMD+K Search Overlay Interaction
     searchInput?.addEventListener('focus', () => {
       spotlightOverlay?.classList.add('active');
     });
@@ -96,52 +222,58 @@ class XenoUninstallerModernApp {
       this.renderDeck();
     });
 
-    // Close spotlight on overlay click
     spotlightOverlay?.addEventListener('click', () => {
       searchInput?.blur();
       spotlightOverlay.classList.remove('active');
     });
 
-    const btnToggleSidebar = document.getElementById('btn-toggle-sidebar');
-    const sidebarNav = document.getElementById('sidebar-nav');
-    btnToggleSidebar?.addEventListener('click', () => {
-      sidebarNav?.classList.toggle('-ml-64');
-    });
-
-    const btnToggleInspector = document.getElementById('btn-toggle-inspector');
     const btnCloseSheet = document.getElementById('btn-close-sheet');
     const inspectorSheet = document.getElementById('inspector-sheet');
 
-    const toggleSheet = () => {
+    btnCloseSheet?.addEventListener('click', () => {
       inspectorSheet?.classList.toggle('hidden');
-    };
-    btnToggleInspector?.addEventListener('click', toggleSheet);
-    btnCloseSheet?.addEventListener('click', toggleSheet);
-
-    const sortDropdown = document.getElementById('sort-dropdown') as HTMLSelectElement;
-    sortDropdown?.addEventListener('change', () => {
-      this.currentSort = sortDropdown.value;
-      this.renderDeck();
     });
 
     document.getElementById('btn-refresh')?.addEventListener('click', () => {
       this.render();
     });
 
-    // 3. CMD+K / Global Hotkeys
+    document.getElementById('btn-add-app')?.addEventListener('click', () => {
+      const name = prompt('Enter custom application or binary name to register:');
+      if (name) {
+        this.apps.unshift({
+          id: name.toLowerCase().replace(/\s+/g, '-'),
+          name: name,
+          version: '1.0.0-custom',
+          description: 'Manually tracked custom binary or game executable',
+          sizeBytes: 450 * 1024 * 1024,
+          sizeFormatted: '450.0 MB',
+          category: 'Games & Emulators',
+          source: 'appimage',
+          isSystemProtected: false,
+          isUserApp: true,
+          isOrphan: false,
+          dependencies: [],
+          reverseDependencies: [],
+          execPath: `/usr/local/bin/${name.toLowerCase().replace(/\s+/g, '-')}`,
+          residuals: [
+            { path: `~/.config/${name.toLowerCase()}`, type: 'config', sizeFormatted: '1.0 MB', confidence: 'VERIFIED' }
+          ]
+        });
+        this.render();
+      }
+    });
+
+    document.getElementById('btn-scan-folder')?.addEventListener('click', () => {
+      alert('Scanning directories: ~/Applications, ~/.local/share/Steam/steamapps, and ~/.var/app for new executables...');
+    });
+
+    // Global Hotkeys
     window.addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'k' || e.key.toLowerCase() === 'f')) {
         e.preventDefault();
         searchInput?.focus();
         spotlightOverlay?.classList.add('active');
-      }
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
-        e.preventDefault();
-        btnToggleSidebar?.click();
-      }
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'i') {
-        e.preventDefault();
-        btnToggleInspector?.click();
       }
       if (e.key === 'Escape') {
         searchInput?.blur();
@@ -170,7 +302,7 @@ class XenoUninstallerModernApp {
         if (this.currentFilter === 'CAT_INTERNET' && !cat.includes('internet') && !cat.includes('network')) return false;
         if (this.currentFilter === 'CAT_MULTIMEDIA' && !cat.includes('multimedia') && !cat.includes('audio') && !cat.includes('video')) return false;
         if (this.currentFilter === 'CAT_DEV' && !cat.includes('development')) return false;
-        if (this.currentFilter === 'CAT_GAMES' && !cat.includes('game')) return false;
+        if (this.currentFilter === 'CAT_GAMES' && !cat.includes('game') && !cat.includes('emulator')) return false;
         if (this.currentFilter === 'CAT_OFFICE' && !cat.includes('office')) return false;
       }
 
@@ -184,14 +316,6 @@ class XenoUninstallerModernApp {
       return true;
     });
 
-    list.sort((a, b) => {
-      if (this.currentSort === 'name-asc') return a.name.localeCompare(b.name);
-      if (this.currentSort === 'name-desc') return b.name.localeCompare(a.name);
-      if (this.currentSort === 'source') return a.source.localeCompare(b.source);
-      if (this.currentSort === 'category') return a.category.localeCompare(b.category);
-      return 0;
-    });
-
     return list;
   }
 
@@ -203,7 +327,7 @@ class XenoUninstallerModernApp {
       CAT_INTERNET: this.apps.filter(a => a.category.toLowerCase().includes('internet')).length,
       CAT_MULTIMEDIA: this.apps.filter(a => a.category.toLowerCase().includes('multimedia')).length,
       CAT_DEV: this.apps.filter(a => a.category.toLowerCase().includes('development')).length,
-      CAT_GAMES: this.apps.filter(a => a.category.toLowerCase().includes('game')).length,
+      CAT_GAMES: this.apps.filter(a => a.category.toLowerCase().includes('game') || a.category.toLowerCase().includes('emulator')).length,
       CAT_OFFICE: this.apps.filter(a => a.category.toLowerCase().includes('office')).length,
       PACMAN: this.apps.filter(a => a.source === 'pacman').length,
       FLATPAK: this.apps.filter(a => a.source === 'flatpak').length,
@@ -215,6 +339,9 @@ class XenoUninstallerModernApp {
       const el = document.getElementById(`badge-${key}`);
       if (el) el.innerText = count.toString();
     }
+
+    const appsBadge = document.getElementById('tab-apps-badge');
+    if (appsBadge) appsBadge.innerText = `${this.apps.length}`;
   }
 
   private render() {
@@ -226,64 +353,89 @@ class XenoUninstallerModernApp {
   }
 
   private renderDeck() {
-    const grid = document.getElementById('app-card-grid');
     const emptyState = document.getElementById('empty-state');
     const titleLabel = document.getElementById('deck-view-title');
     const countLabel = document.getElementById('deck-view-count');
 
-    if (!grid) return;
-
     const filtered = this.getFilteredApps();
-    grid.innerHTML = '';
 
-    if (countLabel) countLabel.innerText = `Showing ${filtered.length} of ${this.apps.length} applications`;
-    if (titleLabel) titleLabel.innerText = this.currentFilter === 'ALL' ? 'All Installed Software' : this.currentFilter.replace('CAT_', '');
+    if (countLabel) countLabel.innerText = `4 categories found • ${filtered.length} applications`;
+    if (titleLabel) titleLabel.innerText = this.currentFilter === 'ALL' ? 'Applications' : this.currentFilter.replace('CAT_', '');
 
     if (filtered.length === 0) {
       emptyState?.classList.remove('hidden');
       emptyState?.classList.add('flex');
-      return;
     } else {
       emptyState?.classList.add('hidden');
       emptyState?.classList.remove('flex');
     }
 
-    filtered.forEach((app, index) => {
+    // Group apps by category/type
+    const gamingApps = filtered.filter(a => a.category.toLowerCase().includes('game') || a.category.toLowerCase().includes('emulator') || a.id.includes('rpcs3') || a.id.includes('steam'));
+    const flatpakApps = filtered.filter(a => a.source.toLowerCase() === 'flatpak');
+    const nativeApps = filtered.filter(a => a.source.toLowerCase() === 'pacman');
+    const webApps = filtered.filter(a => a.category.toLowerCase().includes('web') || a.id.includes('webapp') || a.source.toLowerCase() === 'webapp' || a.source.toLowerCase() === 'appimage');
+
+    // Update section counters
+    const countGamingEl = document.getElementById('count-gaming');
+    if (countGamingEl) countGamingEl.innerText = `${gamingApps.length}`;
+
+    const countFlatpakEl = document.getElementById('count-flatpak');
+    if (countFlatpakEl) countFlatpakEl.innerText = `${flatpakApps.length}`;
+
+    const countNativeEl = document.getElementById('count-native');
+    if (countNativeEl) countNativeEl.innerText = `${nativeApps.length}`;
+
+    const countWebappEl = document.getElementById('count-webapp');
+    if (countWebappEl) countWebappEl.innerText = `${webApps.length}`;
+
+    // Render cards into respective grids
+    this.renderGrid('grid-gaming', gamingApps);
+    this.renderGrid('grid-flatpak', flatpakApps);
+    this.renderGrid('grid-native', nativeApps);
+    this.renderGrid('grid-webapp', webApps);
+  }
+
+  private renderGrid(gridId: string, apps: AppPackage[]) {
+    const grid = document.getElementById(gridId);
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    apps.forEach((app, index) => {
       const card = document.createElement('div');
       const isSelected = this.selectedApp?.id === app.id;
       
-      const staggerDelay = Math.min(index * 25, 250);
-      card.className = `glass-card p-6 cursor-pointer flex flex-col justify-between gap-4 animate-card-enter ${isSelected ? 'glass-card-selected' : ''}`;
+      const staggerDelay = Math.min(index * 20, 200);
+      card.className = `glass-card p-4 cursor-pointer flex flex-col justify-between gap-3 animate-card-enter ${isSelected ? 'glass-card-selected' : ''}`;
       card.style.animationDelay = `${staggerDelay}ms`;
       
       const tagClass = `tag-${app.source.toLowerCase()}`;
       const iconUrl = getAppIconUrl(app.id, app.name);
       const initials = app.name.substring(0, 2).toUpperCase();
 
-      // 1. Real System Icons with fallback
       card.innerHTML = `
-        <div class="flex items-start justify-between gap-3">
-          <div class="flex items-center gap-3.5">
-            <div class="w-11 h-11 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center p-2 shadow-inner shrink-0 backdrop-blur-sm overflow-hidden">
-              <img src="${iconUrl}" alt="${app.name}" class="w-full h-full object-contain" onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\\'font-bold text-xeno-gold text-sm\\'>${initials}</span>';" />
+        <div class="flex items-start justify-between gap-2">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center p-2 shadow-inner shrink-0 backdrop-blur-sm overflow-hidden">
+              <img src="${iconUrl}" alt="${app.name}" class="w-full h-full object-contain" onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\\'font-bold text-amber-400 text-xs\\'>${initials}</span>';" />
             </div>
             <div class="overflow-hidden">
-              <h4 class="text-base font-bold text-white tracking-tight truncate">${app.name}</h4>
-              <p class="text-[11px] font-mono text-slate-400/90 truncate mt-0.5">${app.id}</p>
+              <h4 class="text-xs font-bold text-white tracking-tight truncate">${app.name}</h4>
+              <p class="text-[10px] font-mono text-slate-400 truncate mt-0.5">${app.id}</p>
             </div>
           </div>
-          <span class="capsule-pill ${tagClass} shrink-0">
+          <span class="capsule-pill ${tagClass} shrink-0 text-[9px] px-2 py-0.5">
             ${app.source}
           </span>
         </div>
 
-        <p class="text-xs text-slate-400 line-clamp-2 leading-relaxed font-normal">
+        <p class="text-[11px] text-slate-400 line-clamp-2 leading-relaxed font-normal">
           ${app.description || 'Linux application package'}
         </p>
 
-        <div class="pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs text-slate-400">
-          <span class="bg-white/[0.04] px-2.5 py-1 rounded-md text-slate-300 font-medium text-[11px] border border-white/[0.04]">${app.category}</span>
-          <span class="font-mono text-slate-400 text-[11px]">${app.sizeFormatted}</span>
+        <div class="pt-2 border-t border-white/[0.06] flex items-center justify-between text-[10px] text-slate-400">
+          <span class="bg-white/[0.04] px-2 py-0.5 rounded-md text-slate-300 font-medium">${app.category}</span>
+          <span class="font-mono text-slate-400">${app.sizeFormatted}</span>
         </div>
       `;
 
@@ -298,7 +450,7 @@ class XenoUninstallerModernApp {
   private selectApp(app: AppPackage) {
     this.selectedApp = app;
     
-    // 4. Update Ambient Backdrop Glow container dynamically
+    // Update Ambient Backdrop Glow container dynamically
     const backdrop = document.getElementById('ambient-backdrop');
     if (backdrop) {
       backdrop.className = `glow-${app.source.toLowerCase()}`;
@@ -327,7 +479,6 @@ class XenoUninstallerModernApp {
     const iconUrl = getAppIconUrl(app.id, app.name);
     const initials = app.name.substring(0, 2).toUpperCase();
 
-    // 2. Compute visual telemetry ratios
     const sizeMb = Math.round(app.sizeBytes / (1024 * 1024));
     const sizePercent = Math.min(Math.round((sizeMb / 1200) * 100), 100);
     const depsPercent = Math.min(app.dependencies.length * 15, 100);
@@ -340,7 +491,7 @@ class XenoUninstallerModernApp {
       <div class="inspector-glass-card p-5 rounded-2xl space-y-4">
         <div class="flex items-center gap-4">
           <div class="w-14 h-14 rounded-2xl bg-white/[0.05] border border-white/[0.12] flex items-center justify-center p-2.5 shadow-md shrink-0">
-            <img src="${iconUrl}" alt="${app.name}" class="w-full h-full object-contain" onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\\'font-extrabold text-xeno-gold text-lg\\'>${initials}</span>';" />
+            <img src="${iconUrl}" alt="${app.name}" class="w-full h-full object-contain" onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\\'font-extrabold text-amber-400 text-lg\\'>${initials}</span>';" />
           </div>
           <div class="overflow-hidden">
             <h3 class="text-lg font-bold text-white tracking-tight truncate">${app.name}</h3>
@@ -350,7 +501,7 @@ class XenoUninstallerModernApp {
         <p class="text-xs text-slate-300 leading-relaxed">${app.description}</p>
       </div>
 
-      <!-- 2. FORENSIC TELEMETRY GAUGES -->
+      <!-- FORENSIC TELEMETRY GAUGES -->
       <div class="space-y-3">
         <div class="text-[10px] font-extrabold tracking-widest text-slate-500 uppercase px-1">TELEMETRY & FOOTPRINT</div>
         <div class="inspector-glass-card p-4 rounded-xl space-y-3.5">
@@ -358,7 +509,7 @@ class XenoUninstallerModernApp {
           <div>
             <div class="flex items-center justify-between text-xs mb-1.5">
               <span class="text-slate-400 font-medium">Disk Footprint</span>
-              <span class="font-mono text-xeno-gold font-bold">${app.sizeFormatted}</span>
+              <span class="font-mono text-amber-400 font-bold">${app.sizeFormatted}</span>
             </div>
             <div class="telemetry-bar-bg">
               <div class="telemetry-bar-fill bg-gradient-to-r from-amber-500 to-yellow-400" style="width: ${sizePercent}%"></div>
@@ -393,7 +544,7 @@ class XenoUninstallerModernApp {
       <div class="space-y-2.5">
         <div class="text-[10px] font-extrabold tracking-widest text-slate-500 uppercase px-1">PACKAGE METRICS</div>
         <div class="inspector-glass-card rounded-xl divide-y divide-white/[0.05] text-xs">
-          <div class="flex items-center justify-between p-3"><span class="text-slate-400">Source Provider</span><span class="font-bold text-xeno-gold uppercase">${app.source}</span></div>
+          <div class="flex items-center justify-between p-3"><span class="text-slate-400">Source Provider</span><span class="font-bold text-amber-400 uppercase">${app.source}</span></div>
           <div class="flex items-center justify-between p-3"><span class="text-slate-400">Classification</span><span class="text-slate-200">${app.category}</span></div>
           <div class="flex items-center justify-between p-3"><span class="text-slate-400">Release Version</span><span class="font-mono text-slate-200">${app.version}</span></div>
         </div>
@@ -409,25 +560,6 @@ class XenoUninstallerModernApp {
               ${app.execPath}
             </div>
           </div>
-        </div>
-      </div>
-
-      <!-- Direct Dependencies -->
-      <div class="space-y-2.5">
-        <div class="flex items-center justify-between px-1">
-          <span class="text-[10px] font-extrabold tracking-widest text-slate-500 uppercase">DIRECT DEPENDENCIES</span>
-          <span class="text-[10px] font-mono text-slate-500">${app.dependencies.length} packages</span>
-        </div>
-        <div class="space-y-1.5 max-h-36 overflow-y-auto">
-          ${app.dependencies.length > 0 
-            ? app.dependencies.map(d => `
-                <div class="flex items-center justify-between p-2.5 bg-white/[0.02] hover:bg-white/[0.04] rounded-lg border border-white/[0.04] text-xs transition-colors">
-                  <span class="font-mono text-slate-300 text-[11px]">${d}</span>
-                  <span class="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 font-semibold">Required</span>
-                </div>
-              `).join('')
-            : '<div class="text-xs text-slate-500 p-2.5">No required dependencies</div>'
-          }
         </div>
       </div>
 
@@ -472,7 +604,7 @@ class XenoUninstallerModernApp {
     if (planContent) {
       const residualsList = app.residuals.map((r, i) => `
         <label class="flex items-start gap-3.5 p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] cursor-pointer hover:bg-white/[0.06] transition-colors">
-          <input type="checkbox" checked id="chk-res-${i}" class="mt-0.5 accent-xeno-gold rounded" />
+          <input type="checkbox" checked id="chk-res-${i}" class="mt-0.5 accent-amber-500 rounded" />
           <div class="overflow-hidden">
             <div class="font-mono text-slate-200 text-[11px] truncate">${r.path}</div>
             <div class="text-[10px] text-slate-500 uppercase mt-0.5">${r.type} • ${r.sizeFormatted} (Confidence: ${r.confidence})</div>
@@ -525,5 +657,5 @@ class XenoUninstallerModernApp {
 
 // Bootstrap
 window.addEventListener('DOMContentLoaded', () => {
-  new XenoUninstallerModernApp();
+  new UltimateAppManager();
 });

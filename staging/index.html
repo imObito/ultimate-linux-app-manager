@@ -3,153 +3,519 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>XENO Uninstaller — Elite Software Manager</title>
+  <title>Ultimate Linux App Manager — Elite Software Suite</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css">
+  <script type="module" crossorigin src="./app.js"></script>
+  <link rel="stylesheet" crossorigin href="./styles.css">
 </head>
-<body class="bg-obsidian-950 text-gray-100 flex flex-col h-screen w-screen overflow-hidden antialiased relative">
+<body class="theme-obsidian text-gray-100 flex flex-col h-screen w-screen overflow-hidden antialiased relative">
   
-  <!-- 4. Dynamic Hardware-Accelerated Ambient Backdrop Glow -->
+  <!-- Hardware-Accelerated Ambient Backdrop Glow -->
   <div id="ambient-backdrop" class="glow-native"></div>
 
-  <!-- 3. CMD+K Spotlight Search Dim Overlay -->
+  <!-- CMD+K Spotlight Search Dim Overlay -->
   <div id="spotlight-dim-overlay"></div>
 
-  <!-- Top Command Bar -->
-  <header class="h-14 bg-obsidian-900/80 backdrop-blur-xl border-b border-white/[0.08] flex items-center justify-between px-6 z-20 shrink-0 relative">
-    <!-- Left branding -->
-    <div class="flex items-center gap-3.5">
-      <button id="btn-toggle-sidebar" class="w-8 h-8 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] flex items-center justify-center text-slate-400 hover:text-white transition-colors" title="Toggle Navigation (Ctrl+B)">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>
-      </button>
-      <div class="flex items-center gap-2">
-        <span class="px-2 py-0.5 text-[10px] font-black tracking-wider bg-xeno-gold/15 text-xeno-gold border border-xeno-gold/30 rounded">XENO</span>
-        <span class="text-xs font-bold tracking-widest text-slate-200">UNINSTALLER</span>
-      </div>
-    </div>
-
-    <!-- 3. Spotlight Command Bar Interface -->
-    <div class="flex-1 max-w-xl mx-6 z-30">
-      <div class="relative flex items-center" id="search-container">
-        <span class="absolute left-3.5 text-slate-400 pointer-events-none">
-          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-        </span>
-        <input 
-          type="text" 
-          id="global-search-input" 
-          placeholder="Spotlight Command: Search apps, binaries, webapps, packages... (⌘K / Ctrl+F)"
-          class="w-full h-10 bg-obsidian-850/90 border border-white/[0.1] focus:border-xeno-gold/60 focus:bg-obsidian-800 focus:shadow-glow-accent rounded-xl pl-10 pr-24 text-xs text-white placeholder-slate-400 outline-none transition-all duration-200"
-        />
-        <div class="absolute right-3 flex items-center gap-1.5 pointer-events-none">
-          <kbd class="px-1.5 py-0.5 text-[10px] font-mono bg-white/[0.08] border border-white/[0.12] rounded text-slate-300 font-semibold shadow-sm">⌘</kbd>
-          <kbd class="px-1.5 py-0.5 text-[10px] font-mono bg-white/[0.08] border border-white/[0.12] rounded text-slate-300 font-semibold shadow-sm">K</kbd>
+  <!-- Top Global Header & Navigation Bar -->
+  <header class="h-14 bg-obsidian-900/90 backdrop-blur-2xl border-b border-white/[0.08] flex items-center justify-between px-5 z-20 shrink-0 relative">
+    
+    <!-- Left branding & Tab Navigation -->
+    <div class="flex items-center gap-6">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 font-extrabold text-sm shadow-sm shadow-amber-500/20">
+          ⚡
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xs font-black tracking-widest text-white leading-tight">ULTIMATE APP MANAGER</span>
+          <span class="text-[9px] font-semibold text-slate-400 tracking-wider">LINUX SUITE • v1.0.0</span>
         </div>
       </div>
+
+      <!-- Top Navigation Tabs -->
+      <nav class="flex items-center gap-1.5" id="top-nav-tabs">
+        <button class="top-nav-tab active" data-tab="applications">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+          <span>Applications</span>
+          <span class="top-nav-badge" id="tab-apps-badge">1,600+</span>
+        </button>
+
+        <button class="top-nav-tab" data-tab="cleanup">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m19 11-8-8-8.6 8.6a2 2 0 0 0 0 2.8l5.2 5.2c.8.8 2 .8 2.8 0L19 11Z"/><path d="m5 2 5 5"/><path d="M2 13h15"/><path d="M22 20a2 2 0 1 1-4 0c0-1.6 1.7-2.4 2-4 .3 1.6 2 2.4 2 4Z"/></svg>
+          <span>System Cleaner</span>
+        </button>
+
+        <button class="top-nav-tab" data-tab="settings">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span>Settings</span>
+        </button>
+
+        <button class="top-nav-tab" data-tab="about">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+          <span>About</span>
+        </button>
+      </nav>
     </div>
 
-    <!-- Right Controls -->
-    <div class="flex items-center gap-2.5">
-      <button id="btn-refresh" class="h-8 px-3.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] flex items-center gap-1.5 text-xs font-medium text-slate-300 hover:text-white transition-colors">
-        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
-        <span>Refresh</span>
-      </button>
-      <button id="btn-toggle-inspector" class="h-8 px-3.5 rounded-lg bg-xeno-gold/10 hover:bg-xeno-gold/20 border border-xeno-gold/30 flex items-center gap-1.5 text-xs font-semibold text-xeno-gold transition-colors">
-        <span>Inspector</span>
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M15 3v18"/></svg>
-      </button>
+    <!-- Right Status & Sponsor Capsule -->
+    <div class="flex items-center gap-3">
+      <!-- Status Pill -->
+      <div class="hidden sm:flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-[11px] font-semibold text-emerald-400">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span>Ready</span>
+      </div>
+
+      <!-- Build Capsule -->
+      <div class="hidden md:flex items-center px-2.5 py-0.5 bg-white/[0.04] border border-white/[0.08] rounded-md text-[10px] font-mono text-slate-300">
+        STABLE BUILD
+      </div>
+
+      <!-- Sponsor / Buy Me a Coffee Button -->
+      <a href="https://github.com/imObito/ultimate-linux-app-manager" target="_blank" class="h-8 px-3.5 rounded-lg bg-gradient-to-r from-rose-500 via-pink-500 to-amber-500 hover:opacity-95 text-white text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-rose-950/40 transition-all hover:scale-[1.02] active:scale-[0.98]">
+        <span>☕</span>
+        <span>Buy me a Cup of Coffee</span>
+      </a>
     </div>
   </header>
 
-  <!-- 3-Column Dashboard Body -->
+  <!-- Top Quick Tip Notification Bar -->
+  <div id="quick-tip-banner" class="bg-obsidian-850/95 border-b border-white/[0.06] px-6 py-2.5 flex items-center justify-between text-xs text-slate-300 z-10 shrink-0">
+    <div class="flex items-center gap-2.5 overflow-hidden">
+      <span class="font-bold text-amber-400 shrink-0">Quick tip</span>
+      <span class="text-slate-400 truncate">Ultimate Linux App Manager scans Pacman, Flatpaks, AppImages, Steam games, and WebApps. Use Settings to customize themes and telemetry, or hit ⌘K to instantly launch spotlight search.</span>
+    </div>
+    <button id="btn-dismiss-tip" class="ml-4 px-3 py-1 bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] rounded-md text-[11px] font-semibold text-slate-200 transition-colors shrink-0">
+      Got it
+    </button>
+  </div>
+
+  <!-- Main View Router Container -->
   <div class="flex flex-1 overflow-hidden relative z-10">
-    
-    <!-- 1. Collapsible Left Sidebar Navigation -->
-    <aside id="sidebar-nav" class="w-64 bg-obsidian-900/70 backdrop-blur-2xl border-r border-white/[0.07] flex flex-col p-3.5 gap-4 shrink-0 transition-all duration-300">
+
+    <!-- ====================================================================
+         VIEW 1: APPLICATIONS & PACKAGES DASHBOARD
+         ==================================================================== -->
+    <section id="view-applications" class="flex flex-1 overflow-hidden w-full">
+      
+      <!-- Collapsible Left Sidebar Navigation -->
+      <aside id="sidebar-nav" class="w-60 bg-obsidian-900/80 backdrop-blur-2xl border-r border-white/[0.07] flex flex-col p-3.5 gap-4 shrink-0 transition-all duration-300">
+        <div>
+          <div class="px-2.5 mb-2 text-[10px] font-extrabold tracking-widest text-slate-500 uppercase">CATEGORIES</div>
+          <nav class="flex flex-col gap-1" id="nav-categories-container">
+            <!-- Dynamic category buttons -->
+          </nav>
+        </div>
+
+        <div class="pt-2 border-t border-white/[0.06]">
+          <div class="px-2.5 mb-2 text-[10px] font-extrabold tracking-widest text-slate-500 uppercase">PACKAGE SOURCES</div>
+          <nav class="flex flex-col gap-1" id="nav-sources-container">
+            <!-- Dynamic source buttons -->
+          </nav>
+        </div>
+
+        <div class="mt-auto px-3 py-2.5 bg-white/[0.02] rounded-xl border border-white/[0.05] flex items-center justify-between text-[11px] text-slate-400">
+          <span>ALPM Engine</span>
+          <span class="font-mono text-emerald-400 font-semibold flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+            CachyOS Linux
+          </span>
+        </div>
+      </aside>
+
+      <!-- Center Applications Deck -->
+      <main class="flex-1 flex flex-col overflow-hidden bg-obsidian-950/40">
+        
+        <!-- Toolbar Summary & Search/Action Controls -->
+        <div class="h-12 px-6 bg-obsidian-900/40 backdrop-blur-md border-b border-white/[0.05] flex items-center justify-between shrink-0 gap-4">
+          <div class="flex items-center gap-3">
+            <h2 id="deck-view-title" class="text-sm font-bold text-white tracking-wide">Applications</h2>
+            <span class="text-slate-600">•</span>
+            <span id="deck-view-count" class="text-xs text-slate-400">4 categories found • 0 total packages</span>
+          </div>
+
+          <!-- Search & Action buttons -->
+          <div class="flex items-center gap-2.5">
+            <!-- Search bar -->
+            <div class="relative w-56">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              </span>
+              <input 
+                type="text" 
+                id="global-search-input" 
+                placeholder="Search (⌘K)..."
+                class="w-full h-8 bg-obsidian-850/90 border border-white/[0.08] focus:border-amber-500/50 rounded-lg pl-8 pr-3 text-xs text-white placeholder-slate-500 outline-none"
+              />
+            </div>
+
+            <!-- Add App button -->
+            <button id="btn-add-app" class="h-8 px-3 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-xs font-semibold text-slate-300 hover:text-white transition-colors flex items-center gap-1.5">
+              <span>+</span>
+              <span>Add a game / app</span>
+            </button>
+
+            <!-- Scan folder button -->
+            <button id="btn-scan-folder" class="h-8 px-3 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-xs font-semibold text-slate-300 hover:text-white transition-colors">
+              Add a folder
+            </button>
+
+            <!-- Rescan button -->
+            <button id="btn-refresh" class="h-8 px-3.5 rounded-lg bg-white/[0.08] hover:bg-white/[0.14] border border-white/[0.12] text-xs font-bold text-white transition-colors flex items-center gap-1.5">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+              <span>Rescan</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Grouped Categorized App Sections Container -->
+        <div class="flex-1 overflow-y-auto p-6 space-y-8" id="applications-scroll-container">
+          
+          <!-- Steam / Gaming Section -->
+          <div class="space-y-3" id="section-gaming">
+            <div class="flex items-center justify-between pb-1 border-b border-white/[0.04]">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-white uppercase tracking-wider">Gaming & Emulators</span>
+                <span class="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 text-[10px] font-bold border border-amber-500/20" id="count-gaming">3</span>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4" id="grid-gaming">
+              <!-- Gaming Cards -->
+            </div>
+          </div>
+
+          <!-- Flatpak Section -->
+          <div class="space-y-3" id="section-flatpak">
+            <div class="flex items-center justify-between pb-1 border-b border-white/[0.04]">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-white uppercase tracking-wider">Flatpak Runtimes & Applications</span>
+                <span class="px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 text-[10px] font-bold border border-purple-500/20" id="count-flatpak">6</span>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4" id="grid-flatpak">
+              <!-- Flatpak Cards -->
+            </div>
+          </div>
+
+          <!-- Native System Packages (Pacman) Section -->
+          <div class="space-y-3" id="section-native">
+            <div class="flex items-center justify-between pb-1 border-b border-white/[0.04]">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-white uppercase tracking-wider">System Packages (Pacman / ALPM)</span>
+                <span class="px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-[10px] font-bold border border-blue-500/20" id="count-native">12</span>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4" id="grid-native">
+              <!-- Native Cards -->
+            </div>
+          </div>
+
+          <!-- WebApps & PWAs Section -->
+          <div class="space-y-3" id="section-webapp">
+            <div class="flex items-center justify-between pb-1 border-b border-white/[0.04]">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-white uppercase tracking-wider">WebApps & Progressive Web Apps</span>
+                <span class="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-bold border border-emerald-500/20" id="count-webapp">4</span>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4" id="grid-webapp">
+              <!-- WebApp Cards -->
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div id="empty-state" class="hidden flex-col items-center justify-center h-80 text-slate-500 gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <p class="text-sm font-medium">No matching applications or packages found</p>
+          </div>
+
+        </div>
+      </main>
+
+      <!-- Right Slide-out Forensic Sheet Panel -->
+      <aside id="inspector-sheet" class="w-[420px] bg-obsidian-900/90 backdrop-blur-2xl border-l border-white/[0.08] flex flex-col shrink-0 shadow-2xl transition-all duration-300">
+        <!-- Inspector Header -->
+        <div class="h-14 px-6 bg-obsidian-850/80 border-b border-white/[0.08] flex items-center justify-between shrink-0">
+          <div class="flex items-center gap-2.5">
+            <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse shadow-sm shadow-amber-400"></span>
+            <span class="text-xs font-extrabold tracking-widest text-slate-200 uppercase">FORENSIC TELEMETRY</span>
+          </div>
+          <button id="btn-close-sheet" class="w-7 h-7 rounded-lg hover:bg-white/[0.08] flex items-center justify-center text-slate-400 hover:text-white transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+        </div>
+
+        <!-- Inspector Content Body with Visual Gauges -->
+        <div id="inspector-body" class="flex-1 overflow-y-auto p-6 space-y-6">
+          <!-- Dynamic forensic details & visual telemetry charts -->
+        </div>
+
+        <!-- Inspector Action Footer -->
+        <div class="p-5 bg-obsidian-850/90 border-t border-white/[0.08] shrink-0">
+          <button id="btn-action-uninstall" class="w-full h-12 bg-rose-600 hover:bg-rose-500 disabled:bg-white/[0.04] disabled:text-slate-600 text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-rose-950/50">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+            <span id="uninstall-btn-label">Uninstall Application</span>
+          </button>
+        </div>
+      </aside>
+
+    </section>
+
+    <!-- ====================================================================
+         VIEW 2: SYSTEM CLEANER & OPTIMIZATION WIZARD
+         ==================================================================== -->
+    <section id="view-cleanup" class="hidden flex-1 overflow-y-auto p-8 max-w-5xl mx-auto w-full space-y-8 animate-fade-in">
+      
+      <!-- Wizard Banner -->
+      <div class="p-6 rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-600/5 to-transparent border border-amber-500/20 flex items-center justify-between">
+        <div class="space-y-1">
+          <h2 class="text-lg font-bold text-white">System Optimization & Residual Cleaner</h2>
+          <p class="text-xs text-slate-400">Deep-audit dangling package caches, unused Flatpak runtimes, and orphaned dependencies.</p>
+        </div>
+        <button id="btn-run-full-clean" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs shadow-lg shadow-amber-500/25 transition-all">
+          ⚡ 1-Click Optimize System
+        </button>
+      </div>
+
+      <!-- Cleaner Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        
+        <!-- Pacman Cache Card -->
+        <div class="p-6 rounded-2xl bg-white/[0.025] border border-white/[0.07] backdrop-blur-xl space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-400 font-bold">📦</div>
+              <div>
+                <h3 class="text-sm font-bold text-white">Pacman Package Cache</h3>
+                <p class="text-[11px] text-slate-400">/var/cache/pacman/pkg</p>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-bold font-mono">1.42 GB</span>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">Retains multiple previous versions of installed packages. Purging non-current versions frees substantial disk space safely.</p>
+          <button class="w-full py-2 bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.08] rounded-xl text-xs font-semibold text-slate-200 transition-colors">
+            Purge Old Cache (paccache -rk1)
+          </button>
+        </div>
+
+        <!-- Flatpak Runtimes Card -->
+        <div class="p-6 rounded-2xl bg-white/[0.025] border border-white/[0.07] backdrop-blur-xl space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400 font-bold">💎</div>
+              <div>
+                <h3 class="text-sm font-bold text-white">Unused Flatpak Runtimes</h3>
+                <p class="text-[11px] text-slate-400">GNOME, KDE, Freedesktop runtimes</p>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-400 text-xs font-bold font-mono">850 MB</span>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">Orphaned runtime libraries left behind after uninstalled Flatpak applications. Safe to remove immediately.</p>
+          <button class="w-full py-2 bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.08] rounded-xl text-xs font-semibold text-slate-200 transition-colors">
+            Uninstall Unused Runtimes
+          </button>
+        </div>
+
+        <!-- Orphan Packages Card -->
+        <div class="p-6 rounded-2xl bg-white/[0.025] border border-white/[0.07] backdrop-blur-xl space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-400 font-bold">🗑️</div>
+              <div>
+                <h3 class="text-sm font-bold text-white">Orphaned Dependencies</h3>
+                <p class="text-[11px] text-slate-400">pacman -Qtdq candidates</p>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-full bg-rose-500/10 text-rose-400 text-xs font-bold font-mono">14 Packages</span>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">Packages that were installed as dependencies but are no longer required by any currently installed software.</p>
+          <button class="w-full py-2 bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.08] rounded-xl text-xs font-semibold text-slate-200 transition-colors">
+            Clean Orphaned Packages
+          </button>
+        </div>
+
+        <!-- Broken Symlinks & Residuals -->
+        <div class="p-6 rounded-2xl bg-white/[0.025] border border-white/[0.07] backdrop-blur-xl space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold">✨</div>
+              <div>
+                <h3 class="text-sm font-bold text-white">Dangling Desktop Shortcuts</h3>
+                <p class="text-[11px] text-slate-400">~/.local/share/applications</p>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold font-mono">0 Broken</span>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">Old application desktop entry files whose target binaries have been removed from the filesystem.</p>
+          <button class="w-full py-2 bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.08] rounded-xl text-xs font-semibold text-slate-200 transition-colors">
+            Scan & Remove Broken Shortcuts
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         VIEW 3: SETTINGS & THEME CUSTOMIZATION
+         ==================================================================== -->
+    <section id="view-settings" class="hidden flex-1 overflow-y-auto p-8 max-w-5xl mx-auto w-full space-y-8 animate-fade-in">
+      
       <div>
-        <div class="px-2.5 mb-2 text-[10px] font-extrabold tracking-widest text-slate-500 uppercase">CATEGORIES</div>
-        <nav class="flex flex-col gap-1" id="nav-categories-container">
-          <!-- Dynamic navigation buttons -->
-        </nav>
+        <h2 class="text-lg font-bold text-white">Application Settings & Themes</h2>
+        <p class="text-xs text-slate-400">Customize visual appearance, safety guardrails, and packaging scanning engine.</p>
       </div>
 
-      <div class="pt-2 border-t border-white/[0.06]">
-        <div class="px-2.5 mb-2 text-[10px] font-extrabold tracking-widest text-slate-500 uppercase">PACKAGE SOURCES</div>
-        <nav class="flex flex-col gap-1" id="nav-sources-container">
-          <!-- Dynamic source buttons -->
-        </nav>
-      </div>
+      <!-- 1. Theme Presets Section -->
+      <div class="p-6 rounded-2xl bg-white/[0.025] border border-white/[0.07] backdrop-blur-xl space-y-4">
+        <h3 class="text-sm font-bold text-white uppercase tracking-wider text-xs">Visual Theme Engine</h3>
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="theme-selector-grid">
+          <!-- Theme 1: Obsidian -->
+          <div class="theme-card p-4 rounded-xl border border-amber-500/50 bg-white/[0.05] cursor-pointer transition-all hover:scale-[1.02] flex flex-col gap-2.5" data-theme="theme-obsidian">
+            <div class="h-10 rounded-lg bg-[#020408] border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-xs">
+              Obsidian Onyx
+            </div>
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="text-slate-300 font-semibold">Apple / Vercel</span>
+              <span class="text-amber-400 font-bold">Active</span>
+            </div>
+          </div>
 
-      <div class="mt-auto px-3 py-2.5 bg-white/[0.02] rounded-xl border border-white/[0.05] flex items-center justify-between text-[11px] text-slate-400">
-        <span>Active Core</span>
-        <span class="font-mono text-emerald-400 font-semibold flex items-center gap-1.5">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-          CachyOS ALPM
-        </span>
-      </div>
-    </aside>
+          <!-- Theme 2: Cyber Emerald -->
+          <div class="theme-card p-4 rounded-xl border border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.04] cursor-pointer transition-all hover:scale-[1.02] flex flex-col gap-2.5" data-theme="theme-emerald">
+            <div class="h-10 rounded-lg bg-[#020906] border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold text-xs">
+              Cyber Emerald
+            </div>
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="text-slate-400 font-semibold">Matrix Neon</span>
+              <span class="text-slate-500 text-[10px]">Select</span>
+            </div>
+          </div>
 
-    <!-- 2. Center Deck (Card Grid & Header Summary) -->
-    <main class="flex-1 flex flex-col overflow-hidden">
-      <!-- Toolbar Summary -->
-      <div class="h-11 px-7 bg-obsidian-900/30 backdrop-blur-md border-b border-white/[0.05] flex items-center justify-between shrink-0">
-        <div class="flex items-center gap-2.5">
-          <span id="deck-view-title" class="text-xs font-bold text-white tracking-wide">All Software</span>
-          <span class="text-slate-600">•</span>
-          <span id="deck-view-count" class="text-xs text-slate-400">Showing 0 applications</span>
+          <!-- Theme 3: Neon Cyberpunk -->
+          <div class="theme-card p-4 rounded-xl border border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.04] cursor-pointer transition-all hover:scale-[1.02] flex flex-col gap-2.5" data-theme="theme-cyberpunk">
+            <div class="h-10 rounded-lg bg-[#07030e] border border-purple-500/30 flex items-center justify-center text-purple-400 font-bold text-xs">
+              Cyberpunk
+            </div>
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="text-slate-400 font-semibold">Violet Glow</span>
+              <span class="text-slate-500 text-[10px]">Select</span>
+            </div>
+          </div>
+
+          <!-- Theme 4: Midnight Titanium -->
+          <div class="theme-card p-4 rounded-xl border border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.04] cursor-pointer transition-all hover:scale-[1.02] flex flex-col gap-2.5" data-theme="theme-titanium">
+            <div class="h-10 rounded-lg bg-[#030814] border border-sky-500/30 flex items-center justify-center text-sky-400 font-bold text-xs">
+              Titanium Ice
+            </div>
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="text-slate-400 font-semibold">Deep Blue</span>
+              <span class="text-slate-500 text-[10px]">Select</span>
+            </div>
+          </div>
         </div>
+      </div>
+
+      <!-- 2. Packaging Scanner Settings -->
+      <div class="p-6 rounded-2xl bg-white/[0.025] border border-white/[0.07] backdrop-blur-xl space-y-5">
+        <h3 class="text-sm font-bold text-white uppercase tracking-wider text-xs">Package Scanner Configuration</h3>
+        
+        <div class="space-y-4 text-xs">
+          <div class="flex items-center justify-between py-2 border-b border-white/[0.04]">
+            <div>
+              <div class="font-semibold text-white">Pacman Database Root</div>
+              <div class="text-slate-400 text-[11px]">Path to ALPM local database directory</div>
+            </div>
+            <input type="text" value="/var/lib/pacman" readonly class="bg-obsidian-850 border border-white/[0.08] text-slate-300 px-3 py-1.5 rounded-lg text-xs font-mono w-48 text-right outline-none">
+          </div>
+
+          <div class="flex items-center justify-between py-2 border-b border-white/[0.04]">
+            <div>
+              <div class="font-semibold text-white">Flatpak System & User Runtimes</div>
+              <div class="text-slate-400 text-[11px]">Include both system-wide and user-level installations</div>
+            </div>
+            <input type="checkbox" checked class="w-4 h-4 rounded text-amber-500 focus:ring-0">
+          </div>
+
+          <div class="flex items-center justify-between py-2 border-b border-white/[0.04]">
+            <div>
+              <div class="font-semibold text-white">Scan AppImages in User Home</div>
+              <div class="text-slate-400 text-[11px]">Automatically check ~/Applications, ~/Downloads, and ~/.local/bin</div>
+            </div>
+            <input type="checkbox" checked class="w-4 h-4 rounded text-amber-500 focus:ring-0">
+          </div>
+
+          <div class="flex items-center justify-between py-2">
+            <div>
+              <div class="font-semibold text-white">System Critical Guardrails (Strict Mode)</div>
+              <div class="text-slate-400 text-[11px]">Block uninstallation of glibc, linux kernel, systemd, pipewire, wayland</div>
+            </div>
+            <input type="checkbox" checked class="w-4 h-4 rounded text-amber-500 focus:ring-0">
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ====================================================================
+         VIEW 4: SYSTEM INFO & ABOUT
+         ==================================================================== -->
+    <section id="view-about" class="hidden flex-1 overflow-y-auto p-8 max-w-4xl mx-auto w-full space-y-6 animate-fade-in">
+      
+      <div class="p-8 rounded-3xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-2xl text-center space-y-4">
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 to-rose-500 flex items-center justify-center text-3xl mx-auto shadow-xl shadow-amber-500/20">
+          ⚡
+        </div>
+        <div>
+          <h2 class="text-xl font-extrabold text-white">Ultimate Linux App Manager</h2>
+          <p class="text-xs text-slate-400 mt-1">Professional Package Intelligence, Dependency Management & Forensic Uninstaller</p>
+        </div>
+
+        <div class="flex items-center justify-center gap-2 pt-2">
+          <span class="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-bold">Version 1.0.0 Stable</span>
+          <span class="px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-bold">Arch / CachyOS x86_64</span>
+        </div>
+      </div>
+
+      <!-- System Specifications -->
+      <div class="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.06] space-y-3 text-xs">
+        <h3 class="font-bold text-white uppercase text-[11px] tracking-wider">Host System Environment</h3>
+        <div class="grid grid-cols-2 gap-3 text-slate-400 font-mono text-[11px]">
+          <div class="p-3 bg-white/[0.02] rounded-xl border border-white/[0.04]">
+            <span class="text-slate-500 block text-[10px]">OPERATING SYSTEM</span>
+            <span class="text-white font-semibold">CachyOS Linux x86_64</span>
+          </div>
+          <div class="p-3 bg-white/[0.02] rounded-xl border border-white/[0.04]">
+            <span class="text-slate-500 block text-[10px]">KERNEL</span>
+            <span class="text-white font-semibold">Linux 7.2.6-cachyos</span>
+          </div>
+          <div class="p-3 bg-white/[0.02] rounded-xl border border-white/[0.04]">
+            <span class="text-slate-500 block text-[10px]">ELECTRON SHELL</span>
+            <span class="text-white font-semibold">v33.4.11 (Chromium 130)</span>
+          </div>
+          <div class="p-3 bg-white/[0.02] rounded-xl border border-white/[0.04]">
+            <span class="text-slate-500 block text-[10px]">FRONTEND ENGINE</span>
+            <span class="text-white font-semibold">TailwindCSS v4 + Vite</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Links & Repository -->
+      <div class="flex items-center justify-between p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06] text-xs">
         <div class="flex items-center gap-3">
-          <label class="text-[11px] text-slate-400">Sort by:</label>
-          <select id="sort-dropdown" class="bg-obsidian-850/80 border border-white/[0.08] text-slate-300 text-xs rounded-lg px-3 py-1 outline-none">
-            <option value="name-asc">Name (A-Z)</option>
-            <option value="name-desc">Name (Z-A)</option>
-            <option value="source">Package Source</option>
-            <option value="category">Category</option>
-          </select>
+          <span class="text-lg">🐙</span>
+          <div>
+            <div class="font-bold text-white">GitHub Open Source Project</div>
+            <div class="text-slate-400 text-[11px]">imObito/ultimate-linux-app-manager</div>
+          </div>
         </div>
+        <a href="https://github.com/imObito/ultimate-linux-app-manager" target="_blank" class="px-4 py-2 bg-white/[0.08] hover:bg-white/[0.14] border border-white/[0.1] rounded-xl text-white font-semibold transition-colors">
+          View Repository ↗
+        </a>
       </div>
 
-      <!-- App Cards Grid Container -->
-      <div class="flex-1 overflow-y-auto p-7">
-        <div id="app-card-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-          <!-- Rendered modern cards -->
-        </div>
+    </section>
 
-        <!-- Empty State -->
-        <div id="empty-state" class="hidden flex-col items-center justify-center h-80 text-slate-500 gap-3">
-          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          <p class="text-sm font-medium">No matching applications or packages found</p>
-        </div>
-      </div>
-    </main>
-
-    <!-- 3. Right Slide-out Forensic Sheet Panel -->
-    <aside id="inspector-sheet" class="w-[420px] bg-obsidian-900/80 backdrop-blur-2xl border-l border-white/[0.08] flex flex-col shrink-0 shadow-2xl transition-all duration-300">
-      <!-- Inspector Header -->
-      <div class="h-14 px-6 bg-obsidian-850/70 border-b border-white/[0.08] flex items-center justify-between shrink-0">
-        <div class="flex items-center gap-2.5">
-          <span class="w-2 h-2 rounded-full bg-xeno-gold animate-pulse shadow-sm shadow-xeno-gold"></span>
-          <span class="text-xs font-extrabold tracking-widest text-slate-200 uppercase">FORENSIC TELEMETRY</span>
-        </div>
-        <button id="btn-close-sheet" class="w-7 h-7 rounded-lg hover:bg-white/[0.08] flex items-center justify-center text-slate-400 hover:text-white transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-        </button>
-      </div>
-
-      <!-- Inspector Content Body with Visual Gauges -->
-      <div id="inspector-body" class="flex-1 overflow-y-auto p-6 space-y-6">
-        <!-- Dynamic forensic details & visual telemetry charts -->
-      </div>
-
-      <!-- Inspector Action Footer -->
-      <div class="p-5 bg-obsidian-850/90 border-t border-white/[0.08] shrink-0">
-        <button id="btn-action-uninstall" class="w-full h-12 bg-rose-600 hover:bg-rose-500 disabled:bg-white/[0.04] disabled:text-slate-600 text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-rose-950/50">
-          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-          <span id="uninstall-btn-label">Uninstall Application</span>
-        </button>
-      </div>
-    </aside>
   </div>
 
   <!-- Modern Glassmorphic Uninstall Preview Modal -->
@@ -180,6 +546,5 @@
     </div>
   </div>
 
-  <script type="module" src="./app.js"></script>
 </body>
 </html>
