@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Ultimate Linux App Manager
+GenericName=Package Manager & Uninstaller
+Comment=Ultra-modern, glassmorphic Linux package manager, dependency intelligence utility & forensic software uninstaller
+Exec=sh -c "cd '/home/xenon/MY PROJECTS/uninstaller' && npm start"
+Icon=system-software-install
+Terminal=false
+Type=Application
+Categories=System;Settings;PackageManager;Utility;
+Keywords=package;manager;uninstaller;flatpak;arch;pacman;cleanup;cleaner;
+StartupNotify=true
+StartupWMClass=ultimate-linux-app-manager
