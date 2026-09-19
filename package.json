@@ -30,6 +30,7 @@
       "target": [
         "AppImage"
       ],
+      "artifactName": "ultimate-linux-app-manager-x86_64.AppImage",
       "category": "System",
       "synopsis": "Glassmorphic Linux Package Manager & Forensic Uninstaller",
       "description": "Ultra-modern, glassmorphic Linux package manager, dependency intelligence utility & forensic software uninstaller"
