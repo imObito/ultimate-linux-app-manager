@@ -230,51 +230,48 @@ body {
    ELEVATED ACCENT CAPSULE PILLS
    ========================================================================== */
 .capsule-pill {
-  padding: 3px 10px;
-  border-radius: 9999px;
-  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.5px;
   text-transform: uppercase;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
+  white-space: nowrap;
+  line-height: 1.2;
   transition: all 0.2s ease;
 }
 
 .tag-pacman, .tag-native {
-  background: rgba(59, 130, 246, 0.12);
+  background: rgba(59, 130, 246, 0.15);
   color: #93c5fd;
-  border: 1px solid rgba(59, 130, 246, 0.3);
-  box-shadow: 0 0 12px -2px rgba(59, 130, 246, 0.3);
+  border: 1px solid rgba(59, 130, 246, 0.35);
 }
 
 .tag-webapp {
-  background: rgba(16, 185, 129, 0.12);
+  background: rgba(16, 185, 129, 0.15);
   color: #6ee7b7;
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  box-shadow: 0 0 12px -2px rgba(16, 185, 129, 0.3);
+  border: 1px solid rgba(16, 185, 129, 0.35);
 }
 
 .tag-flatpak {
-  background: rgba(168, 85, 247, 0.12);
+  background: rgba(168, 85, 247, 0.15);
   color: #d8b4fe;
-  border: 1px solid rgba(168, 85, 247, 0.3);
-  box-shadow: 0 0 12px -2px rgba(168, 85, 247, 0.3);
+  border: 1px solid rgba(168, 85, 247, 0.35);
 }
 
 .tag-appimage {
-  background: rgba(245, 158, 11, 0.12);
+  background: rgba(245, 158, 11, 0.15);
   color: #fcd34d;
-  border: 1px solid rgba(245, 158, 11, 0.3);
-  box-shadow: 0 0 12px -2px rgba(245, 158, 11, 0.3);
+  border: 1px solid rgba(245, 158, 11, 0.35);
 }
 
 .tag-wine {
-  background: rgba(244, 63, 94, 0.12);
+  background: rgba(244, 63, 94, 0.15);
   color: #fda4af;
-  border: 1px solid rgba(244, 63, 94, 0.3);
-  box-shadow: 0 0 12px -2px rgba(244, 63, 94, 0.3);
+  border: 1px solid rgba(244, 63, 94, 0.35);
 }
 
 /* ==========================================================================

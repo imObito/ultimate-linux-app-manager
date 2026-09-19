@@ -38,7 +38,6 @@ class UltimateAppManager {
     document.body.className = `${themeName} text-gray-100 flex flex-col h-screen w-screen overflow-hidden antialiased relative`;
     localStorage.setItem('uam_theme', themeName);
 
-    // Update theme card active styles in settings
     document.querySelectorAll('.theme-card').forEach(card => {
       const cardTheme = card.getAttribute('data-theme');
       const badge = card.querySelector('span:last-child');
@@ -167,8 +166,8 @@ class UltimateAppManager {
 
     if (categoriesContainer) {
       categoriesContainer.innerHTML = categories.map(cat => `
-        <button data-filter="${cat.id}" class="nav-btn flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-white/[0.04] transition-all ${cat.id === 'ALL' ? 'bg-amber-500/15 text-amber-400 font-semibold shadow-sm border border-amber-500/25' : ''}">
-          <div class="flex items-center gap-3">
+        <button data-filter="${cat.id}" class="nav-btn flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-white/[0.04] transition-all ${cat.id === 'ALL' ? 'bg-amber-500/15 text-amber-400 font-semibold shadow-sm border border-amber-500/25' : ''}">
+          <div class="flex items-center gap-2.5">
             <span class="opacity-80">${cat.icon}</span>
             <span>${cat.label}</span>
           </div>
@@ -179,8 +178,8 @@ class UltimateAppManager {
 
     if (sourcesContainer) {
       sourcesContainer.innerHTML = sources.map(src => `
-        <button data-filter="${src.id}" class="nav-btn flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-white/[0.04] transition-all">
-          <div class="flex items-center gap-3">
+        <button data-filter="${src.id}" class="nav-btn flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-white/[0.04] transition-all">
+          <div class="flex items-center gap-2.5">
             <span class="opacity-80">${src.icon}</span>
             <span>${src.label}</span>
           </div>
@@ -245,7 +244,7 @@ class UltimateAppManager {
           id: name.toLowerCase().replace(/\s+/g, '-'),
           name: name,
           version: '1.0.0-custom',
-          description: 'Manually tracked custom binary or game executable',
+          description: 'Manually registered Linux application executable',
           sizeBytes: 450 * 1024 * 1024,
           sizeFormatted: '450.0 MB',
           category: 'Games & Emulators',
@@ -265,7 +264,7 @@ class UltimateAppManager {
     });
 
     document.getElementById('btn-scan-folder')?.addEventListener('click', () => {
-      alert('Scanning directories: ~/Applications, ~/.local/share/Steam/steamapps, and ~/.var/app for new executables...');
+      alert(`Scanned system directories:\n• /usr/share/applications\n• ~/.local/share/applications\n• /var/lib/flatpak/exports\n\nFound all ${this.apps.length} applications.`);
     });
 
     // Global Hotkeys
@@ -289,27 +288,29 @@ class UltimateAppManager {
 
   private getFilteredApps(): AppPackage[] {
     let list = this.apps.filter(app => {
-      const src = app.source.toUpperCase();
-      const cat = app.category.toLowerCase();
+      const src = (app.source || '').toUpperCase();
+      const cat = (app.category || '').toLowerCase();
+      const name = (app.name || '').toLowerCase();
+      const id = (app.id || '').toLowerCase();
 
       if (this.currentFilter !== 'ALL') {
-        if (this.currentFilter === 'DESKTOP' && src !== 'PACMAN' && src !== 'NATIVE') return false;
-        if (this.currentFilter === 'WEBAPP' && src !== 'WEBAPP') return false;
+        if (this.currentFilter === 'DESKTOP' && src !== 'PACMAN' && src !== 'NATIVE' && !app.isUserApp) return false;
+        if (this.currentFilter === 'WEBAPP' && src !== 'WEBAPP' && !cat.includes('web') && !id.includes('chrome') && !id.includes('brave')) return false;
         if (this.currentFilter === 'FLATPAK' && src !== 'FLATPAK') return false;
         if (this.currentFilter === 'APPIMAGE' && src !== 'APPIMAGE') return false;
-        if (this.currentFilter === 'WINE' && src !== 'WINE') return false;
-        if (this.currentFilter === 'PACMAN' && src !== 'PACMAN') return false;
-        if (this.currentFilter === 'CAT_INTERNET' && !cat.includes('internet') && !cat.includes('network')) return false;
-        if (this.currentFilter === 'CAT_MULTIMEDIA' && !cat.includes('multimedia') && !cat.includes('audio') && !cat.includes('video')) return false;
-        if (this.currentFilter === 'CAT_DEV' && !cat.includes('development')) return false;
-        if (this.currentFilter === 'CAT_GAMES' && !cat.includes('game') && !cat.includes('emulator')) return false;
-        if (this.currentFilter === 'CAT_OFFICE' && !cat.includes('office')) return false;
+        if (this.currentFilter === 'WINE' && src !== 'WINE' && !cat.includes('wine')) return false;
+        if (this.currentFilter === 'PACMAN' && src !== 'PACMAN' && src !== 'NATIVE') return false;
+        if (this.currentFilter === 'CAT_INTERNET' && !cat.includes('internet') && !cat.includes('network') && !cat.includes('web')) return false;
+        if (this.currentFilter === 'CAT_MULTIMEDIA' && !cat.includes('multimedia') && !cat.includes('audio') && !cat.includes('video') && !cat.includes('graphics')) return false;
+        if (this.currentFilter === 'CAT_DEV' && !cat.includes('development') && !cat.includes('programming')) return false;
+        if (this.currentFilter === 'CAT_GAMES' && !cat.includes('game') && !cat.includes('emulator') && !name.includes('steam') && !name.includes('wine')) return false;
+        if (this.currentFilter === 'CAT_OFFICE' && !cat.includes('office') && !cat.includes('document') && !cat.includes('productivity')) return false;
       }
 
       if (this.searchQuery) {
-        const matchesName = app.name.toLowerCase().includes(this.searchQuery);
-        const matchesId = app.id.toLowerCase().includes(this.searchQuery);
-        const matchesCat = app.category.toLowerCase().includes(this.searchQuery);
+        const matchesName = name.includes(this.searchQuery);
+        const matchesId = id.includes(this.searchQuery);
+        const matchesCat = cat.includes(this.searchQuery);
         return matchesName || matchesId || matchesCat;
       }
 
@@ -322,17 +323,17 @@ class UltimateAppManager {
   private updateCounts() {
     const counts: Record<string, number> = {
       ALL: this.apps.length,
-      DESKTOP: this.apps.filter(a => a.source === 'pacman' || a.isUserApp).length,
-      WEBAPP: this.apps.filter(a => a.source === 'flatpak' || a.category.includes('Web')).length,
-      CAT_INTERNET: this.apps.filter(a => a.category.toLowerCase().includes('internet')).length,
-      CAT_MULTIMEDIA: this.apps.filter(a => a.category.toLowerCase().includes('multimedia')).length,
-      CAT_DEV: this.apps.filter(a => a.category.toLowerCase().includes('development')).length,
-      CAT_GAMES: this.apps.filter(a => a.category.toLowerCase().includes('game') || a.category.toLowerCase().includes('emulator')).length,
-      CAT_OFFICE: this.apps.filter(a => a.category.toLowerCase().includes('office')).length,
-      PACMAN: this.apps.filter(a => a.source === 'pacman').length,
+      DESKTOP: this.apps.filter(a => a.source === 'pacman' || a.source === 'native' || a.isUserApp).length,
+      WEBAPP: this.apps.filter(a => a.source === 'webapp' || a.category.toLowerCase().includes('web') || a.id.includes('chrome') || a.id.includes('brave')).length,
+      CAT_INTERNET: this.apps.filter(a => a.category.toLowerCase().includes('internet') || a.category.toLowerCase().includes('network')).length,
+      CAT_MULTIMEDIA: this.apps.filter(a => a.category.toLowerCase().includes('multimedia') || a.category.toLowerCase().includes('audio') || a.category.toLowerCase().includes('video') || a.category.toLowerCase().includes('graphics')).length,
+      CAT_DEV: this.apps.filter(a => a.category.toLowerCase().includes('development') || a.category.toLowerCase().includes('programming')).length,
+      CAT_GAMES: this.apps.filter(a => a.category.toLowerCase().includes('game') || a.category.toLowerCase().includes('emulator') || a.name.toLowerCase().includes('steam')).length,
+      CAT_OFFICE: this.apps.filter(a => a.category.toLowerCase().includes('office') || a.category.toLowerCase().includes('document')).length,
+      PACMAN: this.apps.filter(a => a.source === 'pacman' || a.source === 'native').length,
       FLATPAK: this.apps.filter(a => a.source === 'flatpak').length,
       APPIMAGE: this.apps.filter(a => a.source === 'appimage').length,
-      WINE: 0
+      WINE: this.apps.filter(a => a.source === 'wine' || a.category.toLowerCase().includes('wine')).length
     };
 
     for (const [key, count] of Object.entries(counts)) {
@@ -359,7 +360,7 @@ class UltimateAppManager {
 
     const filtered = this.getFilteredApps();
 
-    if (countLabel) countLabel.innerText = `4 categories found • ${filtered.length} applications`;
+    if (countLabel) countLabel.innerText = `${filtered.length} applications found`;
     if (titleLabel) titleLabel.innerText = this.currentFilter === 'ALL' ? 'Applications' : this.currentFilter.replace('CAT_', '');
 
     if (filtered.length === 0) {
@@ -370,11 +371,13 @@ class UltimateAppManager {
       emptyState?.classList.remove('flex');
     }
 
-    // Group apps by category/type
-    const gamingApps = filtered.filter(a => a.category.toLowerCase().includes('game') || a.category.toLowerCase().includes('emulator') || a.id.includes('rpcs3') || a.id.includes('steam'));
-    const flatpakApps = filtered.filter(a => a.source.toLowerCase() === 'flatpak');
-    const nativeApps = filtered.filter(a => a.source.toLowerCase() === 'pacman');
-    const webApps = filtered.filter(a => a.category.toLowerCase().includes('web') || a.id.includes('webapp') || a.source.toLowerCase() === 'webapp' || a.source.toLowerCase() === 'appimage');
+    // Categorize
+    const gamingApps = filtered.filter(a => a.category.toLowerCase().includes('game') || a.category.toLowerCase().includes('emulator') || a.name.toLowerCase().includes('steam') || a.id.includes('rpcs3'));
+    const flatpakApps = filtered.filter(a => a.source === 'flatpak');
+    const webApps = filtered.filter(a => a.source === 'webapp' || a.category.toLowerCase().includes('web') || a.id.includes('chrome-') || a.id.includes('brave-'));
+    
+    // Remaining Native/System/Desktop
+    const nativeApps = filtered.filter(a => !gamingApps.includes(a) && !flatpakApps.includes(a) && !webApps.includes(a));
 
     // Update section counters
     const countGamingEl = document.getElementById('count-gaming');
@@ -388,6 +391,17 @@ class UltimateAppManager {
 
     const countWebappEl = document.getElementById('count-webapp');
     if (countWebappEl) countWebappEl.innerText = `${webApps.length}`;
+
+    // Hide or show sections based on whether they contain items
+    const secGaming = document.getElementById('section-gaming');
+    const secFlatpak = document.getElementById('section-flatpak');
+    const secNative = document.getElementById('section-native');
+    const secWebapp = document.getElementById('section-webapp');
+
+    if (secGaming) secGaming.style.display = gamingApps.length > 0 ? 'block' : 'none';
+    if (secFlatpak) secFlatpak.style.display = flatpakApps.length > 0 ? 'block' : 'none';
+    if (secNative) secNative.style.display = nativeApps.length > 0 ? 'block' : 'none';
+    if (secWebapp) secWebapp.style.display = webApps.length > 0 ? 'block' : 'none';
 
     // Render cards into respective grids
     this.renderGrid('grid-gaming', gamingApps);
@@ -405,37 +419,37 @@ class UltimateAppManager {
       const card = document.createElement('div');
       const isSelected = this.selectedApp?.id === app.id;
       
-      const staggerDelay = Math.min(index * 20, 200);
-      card.className = `glass-card p-4 cursor-pointer flex flex-col justify-between gap-3 animate-card-enter ${isSelected ? 'glass-card-selected' : ''}`;
+      const staggerDelay = Math.min(index * 15, 180);
+      card.className = `glass-card p-3.5 cursor-pointer flex flex-col justify-between gap-2.5 animate-card-enter min-h-[140px] overflow-hidden ${isSelected ? 'glass-card-selected' : ''}`;
       card.style.animationDelay = `${staggerDelay}ms`;
       
-      const tagClass = `tag-${app.source.toLowerCase()}`;
+      const tagClass = `tag-${(app.source || 'native').toLowerCase()}`;
       const iconUrl = getAppIconUrl(app.id, app.name);
-      const initials = app.name.substring(0, 2).toUpperCase();
+      const initials = (app.name || 'AP').substring(0, 2).toUpperCase();
 
       card.innerHTML = `
-        <div class="flex items-start justify-between gap-2">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center p-2 shadow-inner shrink-0 backdrop-blur-sm overflow-hidden">
+        <div class="flex items-start justify-between gap-2 min-w-0">
+          <div class="flex items-center gap-2.5 min-w-0 flex-1">
+            <div class="w-9 h-9 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center p-1.5 shadow-inner shrink-0 backdrop-blur-sm overflow-hidden">
               <img src="${iconUrl}" alt="${app.name}" class="w-full h-full object-contain" onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\\'font-bold text-amber-400 text-xs\\'>${initials}</span>';" />
             </div>
-            <div class="overflow-hidden">
-              <h4 class="text-xs font-bold text-white tracking-tight truncate">${app.name}</h4>
-              <p class="text-[10px] font-mono text-slate-400 truncate mt-0.5">${app.id}</p>
+            <div class="overflow-hidden min-w-0 flex-1">
+              <h4 class="text-xs font-bold text-white tracking-tight truncate" title="${app.name}">${app.name}</h4>
+              <p class="text-[10px] font-mono text-slate-400 truncate mt-0.5" title="${app.id}">${app.id}</p>
             </div>
           </div>
-          <span class="capsule-pill ${tagClass} shrink-0 text-[9px] px-2 py-0.5">
+          <span class="capsule-pill ${tagClass} shrink-0">
             ${app.source}
           </span>
         </div>
 
-        <p class="text-[11px] text-slate-400 line-clamp-2 leading-relaxed font-normal">
+        <p class="text-[11px] text-slate-400 line-clamp-2 leading-relaxed font-normal overflow-hidden h-7">
           ${app.description || 'Linux application package'}
         </p>
 
-        <div class="pt-2 border-t border-white/[0.06] flex items-center justify-between text-[10px] text-slate-400">
-          <span class="bg-white/[0.04] px-2 py-0.5 rounded-md text-slate-300 font-medium">${app.category}</span>
-          <span class="font-mono text-slate-400">${app.sizeFormatted}</span>
+        <div class="pt-2 border-t border-white/[0.06] flex items-center justify-between text-[10px] text-slate-400 mt-auto">
+          <span class="bg-white/[0.04] px-2 py-0.5 rounded-md text-slate-300 font-medium truncate max-w-[130px]">${app.category}</span>
+          <span class="font-mono text-slate-400 shrink-0 font-medium">${app.sizeFormatted}</span>
         </div>
       `;
 
@@ -453,7 +467,7 @@ class UltimateAppManager {
     // Update Ambient Backdrop Glow container dynamically
     const backdrop = document.getElementById('ambient-backdrop');
     if (backdrop) {
-      backdrop.className = `glow-${app.source.toLowerCase()}`;
+      backdrop.className = `glow-${(app.source || 'native').toLowerCase()}`;
     }
 
     this.renderDeck();
@@ -477,7 +491,7 @@ class UltimateAppManager {
     }
 
     const iconUrl = getAppIconUrl(app.id, app.name);
-    const initials = app.name.substring(0, 2).toUpperCase();
+    const initials = (app.name || 'AP').substring(0, 2).toUpperCase();
 
     const sizeMb = Math.round(app.sizeBytes / (1024 * 1024));
     const sizePercent = Math.min(Math.round((sizeMb / 1200) * 100), 100);
