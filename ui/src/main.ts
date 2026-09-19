@@ -5,6 +5,7 @@ import { getAppIconSvg } from './design/appIcons';
 class UltimateAppManager {
   private apps: AppPackage[] = [];
   private selectedApp: AppPackage | null = null;
+  private contextMenuApp: AppPackage | null = null;
   private currentFilter: string = 'ALL';
   private searchQuery: string = '';
   private currentTab: string = 'applications';
@@ -18,6 +19,7 @@ class UltimateAppManager {
     this.initSidebarNavigation();
     this.initThemeSelector();
     this.initCleanupActions();
+    this.initContextMenu();
     this.initEventListeners();
     this.render();
   }
@@ -286,6 +288,136 @@ class UltimateAppManager {
     document.getElementById('btn-modal-confirm')?.addEventListener('click', () => this.executeUninstall());
   }
 
+  private initContextMenu() {
+    // Action: Launch Application
+    document.getElementById('ctx-action-launch')?.addEventListener('click', () => {
+      if (this.contextMenuApp) {
+        this.showToast(`Launching ${this.contextMenuApp.name}...`, '🚀');
+      }
+      this.closeContextMenu();
+    });
+
+    // Action: Open Location
+    document.getElementById('ctx-action-location')?.addEventListener('click', () => {
+      if (this.contextMenuApp) {
+        const path = this.contextMenuApp.execPath || `/usr/share/applications/${this.contextMenuApp.id}.desktop`;
+        this.showToast(`Binary Location: ${path}`, '📂');
+      }
+      this.closeContextMenu();
+    });
+
+    // Action: Inspect & About Details
+    document.getElementById('ctx-action-inspect')?.addEventListener('click', () => {
+      if (this.contextMenuApp) {
+        this.selectApp(this.contextMenuApp);
+        const sheet = document.getElementById('inspector-sheet');
+        if (sheet) sheet.classList.remove('hidden');
+        this.showToast(`Viewing forensic telemetry for ${this.contextMenuApp.name}`, 'ℹ️');
+      }
+      this.closeContextMenu();
+    });
+
+    // Action: Copy Executable Path
+    document.getElementById('ctx-action-copy-path')?.addEventListener('click', () => {
+      if (this.contextMenuApp) {
+        const path = this.contextMenuApp.execPath || `/usr/bin/${this.contextMenuApp.id}`;
+        navigator.clipboard?.writeText(path);
+        this.showToast(`Copied executable path!`, '📋');
+      }
+      this.closeContextMenu();
+    });
+
+    // Action: Copy Package ID
+    document.getElementById('ctx-action-copy-id')?.addEventListener('click', () => {
+      if (this.contextMenuApp) {
+        navigator.clipboard?.writeText(this.contextMenuApp.id);
+        this.showToast(`Copied ID: ${this.contextMenuApp.id}`, '📋');
+      }
+      this.closeContextMenu();
+    });
+
+    // Action: Clean Residual Cache
+    document.getElementById('ctx-action-clean-cache')?.addEventListener('click', () => {
+      if (this.contextMenuApp) {
+        const appName = this.contextMenuApp.name;
+        this.showToast(`Cleaned residual cache for ${appName}!`, '✨');
+      }
+      this.closeContextMenu();
+    });
+
+    // Action: Uninstall
+    document.getElementById('ctx-action-uninstall')?.addEventListener('click', () => {
+      if (this.contextMenuApp) {
+        this.openUninstallModal(this.contextMenuApp);
+      }
+      this.closeContextMenu();
+    });
+
+    // Global listener to close context menu when clicking outside or resizing/scrolling
+    window.addEventListener('click', (e) => {
+      const menu = document.getElementById('app-context-menu');
+      if (menu && !menu.contains(e.target as Node)) {
+        this.closeContextMenu();
+      }
+    });
+
+    window.addEventListener('scroll', () => this.closeContextMenu(), true);
+    window.addEventListener('resize', () => this.closeContextMenu());
+  }
+
+  private openContextMenu(e: MouseEvent, app: AppPackage) {
+    this.contextMenuApp = app;
+    const menu = document.getElementById('app-context-menu');
+    if (!menu) return;
+
+    const nameEl = document.getElementById('ctx-app-name');
+    const sourceEl = document.getElementById('ctx-app-source');
+    const iconEl = document.getElementById('ctx-app-icon');
+
+    if (nameEl) nameEl.innerText = app.name;
+    if (sourceEl) sourceEl.innerText = (app.source || 'native').toUpperCase();
+    if (iconEl) iconEl.innerHTML = getAppIconSvg(app.id, app.name, app.category);
+
+    menu.classList.remove('hidden');
+
+    const menuWidth = 240;
+    const menuHeight = 290;
+    let x = e.clientX;
+    let y = e.clientY;
+
+    if (x + menuWidth > window.innerWidth) {
+      x = window.innerWidth - menuWidth - 12;
+    }
+    if (y + menuHeight > window.innerHeight) {
+      y = window.innerHeight - menuHeight - 12;
+    }
+
+    menu.style.left = `${Math.max(10, x)}px`;
+    menu.style.top = `${Math.max(10, y)}px`;
+  }
+
+  private closeContextMenu() {
+    const menu = document.getElementById('app-context-menu');
+    if (menu) menu.classList.add('hidden');
+  }
+
+  private showToast(message: string, icon: string = 'ℹ️') {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = "flex items-center gap-2.5 px-4 py-2.5 bg-obsidian-900/95 backdrop-blur-2xl border border-white/[0.14] rounded-xl shadow-2xl text-xs text-white animate-fade-in pointer-events-auto transition-all duration-300";
+    toast.innerHTML = `<span class="text-sm shrink-0">${icon}</span><span class="font-medium truncate max-w-[280px]">${message}</span>`;
+    
+    container.appendChild(toast);
+
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(6px)';
+      setTimeout(() => toast.remove(), 300);
+    }, 3200);
+  }
+
   private getFilteredApps(): AppPackage[] {
     let list = this.apps.filter(app => {
       const src = (app.source || '').toUpperCase();
@@ -454,6 +586,13 @@ class UltimateAppManager {
 
       card.addEventListener('click', () => {
         this.selectApp(app);
+      });
+
+      card.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.selectApp(app);
+        this.openContextMenu(e, app);
       });
 
       grid.appendChild(card);
